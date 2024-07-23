@@ -1,8 +1,20 @@
 const knightMoves = function(start, end) {
+
+    if(!validPoint(start[0], start[1]) || !validPoint(end[0], end[1])) {
+        console.log("Invalid coordinates");
+        return;
+    }
+
+    if (start[0] == end[0] && start[1] == end[1]) {
+        console.log("You are at the destination");
+        return;
+    }
+        
+
     const graph = prepareGraph()
 
-    const par = Array.from({ length: 8 }, () => Array(8).fill(-1));
-    const dist = Array.from({ length: 8 }, () => Array(8).fill(Infinity));
+    let par = Array.from({ length: 8 }, () => Array(8).fill(-1));
+    let dist = Array.from({ length: 8 }, () => Array(8).fill(Infinity));
 
     bfs(start, graph, par, dist);
 
@@ -15,19 +27,17 @@ const knightMoves = function(start, end) {
 
     let currNode = end;
 
-    
-
-    while(par[currNode[0][currNode[1]]] !== -1) {
+    while(par[currNode[0]][currNode[1]] !== -1) {
         const x = currNode[0];
-        const y = currNode[0];
+        const y = currNode[1];
 
         path.push(par[x][y]);
-        currNode = par[par[x][y]];
+        currNode = par[x][y];
     }
 
     const result = path.reverse();
 
-    console.log(`You made it in ${result.length} moves!`);
+    console.log(`You made it in ${result.length-1} moves!`);
     
     for(const move of result) {
         console.log(move);
@@ -54,9 +64,15 @@ const prepareGraph = () => {
 
 const bfs = function(start, graph, parent, dist) {
     
-    // Fills the distance graph and parent graph with values
+    // Fills the distance array and parent array with values
+
+    // node is a [x,y]
+    // graph[3][3] = [[4,3], [2,2]]
+    // dist [3][3] = 5
+    // parent[3][3] = [4,3]
 
     const queue = [start];
+    dist[start[0]][start[1]] = 0;
 
     while(queue.length > 0) {
         const currNode = queue.shift();
@@ -82,75 +98,28 @@ const bfs = function(start, graph, parent, dist) {
 
 }
 
-
-
 const getPossibleMoves = (x,y) => {
-    // check all possible move directions from here
 
     const possibleMoves = [];
 
-    // NE 1
-    let moveY = y + 2;
-    let moveX = x + 1;
+    // check all possible move directions from here
 
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
+    const moves = [
+        [2, 1], [2, -1], [-2, 1], [-2, -1], 
+        [1, 2], [1, -2], [-1, 2], [-1, -2], 
+    ]
 
-    // NE 2
-    moveY = y + 1;
-    moveX = x + 2;
+    for(const [dx, dy] of moves) {
+        const moveX = x + dx;
+        const moveY = y + dy;
 
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // NW 1
-    moveY = y + 2;
-    moveX = x - 1;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // NW 2
-    moveY = y + 1;
-    moveX = x - 2;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // SE 1
-    moveY = y - 1;
-    moveX = x + 2;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // SE 2
-    moveY = y - 2;
-    moveX = x + 1;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // SW 1
-    moveY = y - 1;
-    moveX = x - 2;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
-    // SW 2
-    moveY = y - 2;
-    moveX = x - 1;
-
-    if(validPoint(moveX, moveY))
-        possibleMoves.push([moveX, moveY]);
-
+        if(validPoint(moveX, moveY))
+            possibleMoves.push([moveX, moveY]);
+    }
+    
     return possibleMoves;
 }
 
 const validPoint = (x,y) => x >= 0 && x <= 7 && y >= 0 && y <= 7;
-
-
-
 
 export default knightMoves;
